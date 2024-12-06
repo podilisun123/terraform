@@ -2,7 +2,7 @@
 resource "aws_instance" "expense" {
   for_each = var.instance_names
   ami           = data.aws_ami.ami_info.id
-  vpc_security_group_ids = [aws_security_group.allow_ssh.id]
+  vpc_security_group_ids = [aws_security_group.allow_ports.id]
   instance_type = each.value
 
   tags = merge(
@@ -15,15 +15,18 @@ resource "aws_instance" "expense" {
 }
 
 ### sg ###
-resource "aws_security_group" "allow_ssh" {
+resource "aws_security_group" "allow_ports" {
     name        = var.sg_name
     description = var.sg_description
 
-    ingress {
-        from_port        = var.ssh_port
-        to_port          = var.ssh_port
-        protocol         = var.ssh_protocol
-        cidr_blocks      = var.cidr_block
+    dynamic "ingress" {
+        for_each = var.inbound_rules
+        content {
+            from_port        = ingress.value["port"]
+            to_port          = ingress.value["port"]
+            protocol         = ingress.value["protocol"]
+            cidr_blocks      = ingress.value["allowed_cidr"]
+        }
         
     }
 
@@ -36,6 +39,6 @@ resource "aws_security_group" "allow_ssh" {
     }
 
     tags = {
-        Name = "allow_ssh"
+        Name = "all ports"
     }
 }

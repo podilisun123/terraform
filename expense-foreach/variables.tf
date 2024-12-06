@@ -24,21 +24,48 @@ variable "common_tags" {
 
 ### sg ###
 variable "sg_name" {
-    default = "allow_ssh"
+    default = "allow_multiports"
 }
 variable "sg_description" {
-    default = "Allow ssh traffic"
+    default = "Allow 22,80,8080,3306 ports"
 }
-variable "ssh_port" {
-    type = number
-    default = 22
-}
-variable "ssh_protocol" {
-    default = "tcp"
-}
+# variable "ssh_port" {
+#     type = number
+#     default = 22
+# }
+# variable "ssh_protocol" {
+#     default = "tcp"
+# }
 variable "cidr_block" {
     type = list(string)
     default = ["0.0.0.0/0"]
+}
+variable "inbound_rules" {
+    type = list
+    default = [
+        {
+            port = 22,
+            allowed_cidr = ["0.0.0.0/0"]
+            protocol = "tcp"    
+        },
+        {
+            port = 80,
+            allowed_cidr = ["0.0.0.0/0"]
+            protocol = "tcp"   
+        },
+        {
+            port = 8080,
+            allowed_cidr = ["0.0.0.0/0"]
+            protocol = "tcp"
+        },
+            
+        {
+            port = 3306,
+            allowed_cidr = ["0.0.0.0/0"]
+            protocol = "tcp"  
+        }
+    ]
+    
 }
 
 # r53
